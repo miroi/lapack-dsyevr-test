@@ -4,4 +4,45 @@ lapack-dsyevr-test
 
 Important self-test of the famous lapack's diagonalization routine DSYEVR.
 
-Build upon autocmake.
+Software buildup is based upon autocmake project.
+
+Examples of building
+--------------------
+
+- Gfortran and system native libraries (/usr/lib/liblapack.so /usr/lib/libblas.so)
+
+::
+
+ python setup --fc=gfortran --cmake-options="-D MATH_LIB_SEARCH_ORDER='SYSTEM_NATIVE'"  build_gfortran_sysnatlibs
+ cd build_gfortran_sysnatlibs
+ make VERBOSE=1
+ cd src
+ ./dsyerv_check
+
+confirms uncorrect dsyevr routine:
+
+::
+
+ **** LAPACK DSYEVR ****
+ U^{+}*A*U - eps ?= 0> norm/diag:0.1147D-14  norm/offdiag:0.1365D-05
+     U^{+}*U - I ?= 0> norm/diag:0.3824D-15  norm/offdiag:0.2729D-05
+     U*U^{+} - I ?= 0> norm/diag:0.8556D-05  norm/offdiag:0.5285D-05
+
+- Gfortran and downloaded Lapack 3.6.0
+
+::
+ 
+ python setup --fc=gfortran --blas=off --lapack=off --cmake-options="-D EXPLICIT_LIBS='-L/u/milias/Work/qch/software/lapack/lapack-3.6.0/build/lib -llapack -lblas'"  build_gfortran_lapack3.6.0
+
+shows wrong dsyevr routine:
+
+::
+
+  **** LAPACK DSYEVR ****
+ U^{+}*A*U - eps ?= 0> norm/diag:0.1616D-14  norm/offdiag:0.1419D-06
+     U^{+}*U - I ?= 0> norm/diag:0.3454D-15  norm/offdiag:0.2838D-06
+     U*U^{+} - I ?= 0> norm/diag:0.1047D-05  norm/offdiag:0.7950D-06
+
+
+
+
