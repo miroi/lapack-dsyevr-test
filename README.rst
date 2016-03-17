@@ -33,6 +33,11 @@ confirms uncorrect dsyevr routine:
 ::
  
  python setup --fc=gfortran --blas=off --lapack=off --cmake-options="-D EXPLICIT_LIBS='-L/u/milias/Work/qch/software/lapack/lapack-3.6.0/build/lib -llapack -lblas'"  build_gfortran_lapack3.6.0
+ cd build_gfortran_lapack3.6.0
+ make VERBOSE=1
+ cd src
+ ./dsyerv_check
+
 
 shows wrong dsyevr routine:
 
