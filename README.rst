@@ -19,7 +19,7 @@ Buildup examples
  cd src
  ./dsyerv_check
 
-confirms uncorrect dsyevr routine:
+confirms nonorthogonality in dsyevr routine:
 
 ::
 
@@ -40,7 +40,7 @@ confirms uncorrect dsyevr routine:
  ./dsyerv_check
 
 
-shows wrong dsyevr routine:
+show again the nonorthogonality:
 
 ::
 
@@ -60,7 +60,7 @@ shows wrong dsyevr routine:
  cd src
  ./dsyerv_check
 
-confirms correct dsyevr routine:
+confirms vectors orthogonality in the dsyevr routine:
 
 ::
 
@@ -80,7 +80,7 @@ confirms correct dsyevr routine:
  cd src
  ./dsyerv_check
 
-has proper dsyevr routine as we can see from the output
+has proper orthogonality in the dsyevr routine as we can see from the output:
 
 ::
  
