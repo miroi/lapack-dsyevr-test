@@ -21,6 +21,10 @@ Usage:
 Options:
   --fc=<FC>                              Fortran compiler [default: gfortran].
   --extra-fc-flags=<EXTRA_FCFLAGS>       Extra Fortran compiler flags [default: ''].
+  --blas=<BLAS>                          Detect and link BLAS library (auto or off) [default: auto].
+  --lapack=<LAPACK>                      Detect and link LAPACK library (auto or off) [default: auto].
+  --mkl=<MKL>                            Pass MKL flag to the Intel compiler and linker and skip BLAS/LAPACK detection (sequential, parallel, cluster, or off) [default: off].
+  --explicit-libs=<LIBS>                 Explicit linker specification for extra libraries passed directly to the linker [default: off].
   --type=<TYPE>                          Set the CMake build type (debug, release, or relwithdeb) [default: release].
   --generator=<STRING>                   Set the CMake build system generator [default: Unix Makefiles].
   --show                                 Show CMake command and exit.
@@ -40,6 +44,13 @@ def gen_cmake_command(options, arguments):
     command.append('FC={0}'.format(arguments['--fc']))
     command.append('%s' % arguments['--cmake-executable'])
     command.append('-DEXTRA_FCFLAGS="{0}"'.format(arguments['--extra-fc-flags']))
+    command.append('-DENABLE_BLAS=%s' % arguments['--blas'])
+    command.append('-DENABLE_LAPACK=%s' % arguments['--lapack'])
+    command.append('-DMKL_FLAG=%s' % arguments['--mkl'])
+    command.append('-DMATH_LIB_SEARCH_ORDER="MKL;ESSL;OPENBLAS;ATLAS;ACML;SYSTEM_NATIVE"')
+    command.append('-DBLAS_LANG=Fortran')
+    command.append('-DLAPACK_LANG=Fortran')
+    command.append('-DEXPLICIT_LIBS=%s' % arguments['--explicit-libs'].strip())
     command.append('-DCMAKE_BUILD_TYPE=%s' % arguments['--type'])
     command.append('-G "%s"' % arguments['--generator'])
     if arguments['--cmake-options'] != "''":
