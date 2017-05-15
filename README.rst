@@ -40,7 +40,27 @@ confirms nonorthogonality in dsyevr routine:
  ./dsyerv_check
 
 
-show again the nonorthogonality:
+shows the nonorthogonality:
+
+::
+
+  **** LAPACK DSYEVR ****
+ U^{+}*A*U - eps ?= 0> norm/diag:0.1616D-14  norm/offdiag:0.1419D-06
+     U^{+}*U - I ?= 0> norm/diag:0.3454D-15  norm/offdiag:0.2838D-06
+     U*U^{+} - I ?= 0> norm/diag:0.1047D-05  norm/offdiag:0.7950D-06
+
+
+- Gfortran (4.4.7) with the fresh Lapack 3.7.0
+
+::
+
+ python setup --fc=gfortran --blas=off --lapack=off --cmake-options="-D EXPLICIT_LIBS='-L/home/milias/Work/qch/software/smaller_software_projects/lapack-dsyevr-test/lapack-3.7.0/build/lib  -llapack -lblas'"  build_gfortran_lapack3.7.0
+ cd build_gfortran_lapack3.7.0
+ make VERBOSE=1
+ cd src
+ ./dsyerv_check
+
+shows the nonorthogonality:
 
 ::
 
