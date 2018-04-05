@@ -43,11 +43,13 @@ module diagmod
 ! utils/diag.F
 !
 ! Written by Miro Ilias, August 2014
+! Vishnu V. Krishnan, April 2018
 !-------------------------------------------------------------------------------------------
   integer :: N=0,NZ=0, print_level
   integer :: lu=12, LUPRI=6
   real*8, allocatable :: Ar(:,:), ASr(:,:),Ai(:,:),ASi(:,:),  & 
-                         Aj(:,:),ASj(:,:), Ak(:,:), ASk(:,:)
+                         Aj(:,:),ASj(:,:), Ak(:,:), ASk(:,:), &
+                         ArTemp(:,:)
   character*50 :: title_text
   ! hardcoded input matrix name
   character*50 :: matrix_file_name = "Jz_SS_matrix.fermirp2-2"
@@ -120,6 +122,9 @@ contains
    integer :: IWORKDUM,IDUM
    real*8, parameter :: D0=0.0D0
 
+   allocate(ArTemp(N,N), stat=ierr)
+   ArTemp = Ar
+
    ABSTOL=0.0d0; JOBZ='V'; RANGE = 'A'; UPLO = 'U'
    DDUM = D0; IDUM = 0; WORKDUM = D0; IWORKDUM = 0
 
@@ -139,7 +144,7 @@ contains
    IERR =  0 
    ! FYI: LLWORK=-1; LIWORK=-1 on input means calculate temporary storage
    M = N ; LRA = N ;LRV = N
-   CALL DSYEVR(JOBZ,'A','U',N,Ar,LRA,DDUM,DDUM,IDUM,IDUM,ABSTOL,  & 
+   CALL DSYEVR(JOBZ,'A','U',N,ArTemp,LRA,DDUM,DDUM,IDUM,IDUM,ABSTOL,  & 
                M,EIG,VEC,LRV,IDUM,EIG,-1,IWORKDUM,-1,IERR)
 
    LLWORK = NINT(EIG(1))
@@ -150,7 +155,7 @@ contains
    allocate(ISUPPZ(2*N),stat=ierr)
 
    IERR = 0
-   CALL DSYEVR(JOBZ,'A','U',N,Ar,LRA,DDUM,DDUM,IDUM,IDUM,ABSTOL,  &
+   CALL DSYEVR(JOBZ,'A','U',N,ArTemp,LRA,DDUM,DDUM,IDUM,IDUM,ABSTOL,  &
                M,EIG,VEC,LRV,ISUPPZ,WORK,LLWORK,IWORK,LILWORK,IERR)     
    if (IERR /= 0) then
      print *,'The lapack_dsyerv routine ended with error ! ierr=',ierr
@@ -166,9 +171,99 @@ contains
 
    call eigv_check(EIG,VEC,'**** LAPACK DSYEVR ****')
 
-   deallocate(WORK,IWORK,EIG,VEC,ISUPPZ,stat=ierr)
+   deallocate(ArTemp,WORK,IWORK,EIG,VEC,ISUPPZ,stat=ierr)
 
   end subroutine test_lapack_dsyevr
+
+!&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+ subroutine test_lapack_dstegr
+ !
+ ! tests lapack's routine DSTEGR for real symmetric matrices
+ ! after tri-diagonalising with DSYTRD
+ !
+   implicit none
+   integer :: ierr, MATZ, LLWORK, KLWORK, LILWORK
+   integer :: i
+   integer :: IL, INFO, IU, LDA, LDZ, LIWORK, LWORK, M, LRA, LRV
+   character*1 :: JOBZ, RANGE, UPLO
+   real*8 :: ABSTOL, VL, VU
+   integer, allocatable :: ISUPPZ(:), IWORK(:)
+   real*8, allocatable ::  WORK(:), EIG(:),VEC(:,:),DIAG(:),OFFDIAG(:), &
+       RFLCT(:)
+   real*8 :: DDUM, WORKDUM
+   integer :: IWORKDUM,IDUM
+   real*8, parameter :: D0=0.0D0
+
+   allocate(ArTemp(N,N), stat=ierr)
+   ArTemp = Ar
+
+   ABSTOL=0.0d0; JOBZ='V'; RANGE = 'A'; UPLO = 'U'
+   DDUM = D0; IDUM = 0; WORKDUM = D0; IWORKDUM = 0
+
+   M = N ; LRA = N ;LRV = N
+
+   allocate(DIAG(N),OFFDIAG(N),RFLCT(N-1))
+
+   IERR =  0 
+   CALL DSYTRD(UPLO,N,ArTemp,LRA,DIAG,OFFDIAG(:N-1),RFLCT,WORKDUM,-1,IERR)
+
+   LLWORK = NINT(WORKDUM)
+   allocate(WORK(LLWORK))
+
+   IERR = 0
+   CALL DSYTRD(UPLO,N,ArTemp,LRA,DIAG,OFFDIAG(:N-1),RFLCT,WORK,LLWORK,IERR)
+   if (IERR /= 0) then
+     print *,'The lapack_dsytrd routine ended with error ! ierr=',ierr
+   endif
+
+   deallocate(RFLCT,WORK)
+
+   MATZ = 1 
+   IF(MATZ.EQ.1) THEN
+        JOBZ='V'
+   ELSEIF(MATZ.EQ.0) THEN
+        JOBZ='N'
+   ELSE
+     WRITE(*,*) 'Illegal value of MATZ: ',MATZ
+     STOP 2
+   ENDIF
+
+   allocate(EIG(N),VEC(N,N))
+
+   WORKDUM = D0
+   ! 1.call to determine size 
+   IERR =  0 
+   ! FYI: LLWORK=-1; LIWORK=-1 on input means calculate temporary storage
+   CALL DSTEGR(JOBZ,'A',N,DIAG,OFFDIAG,DDUM,DDUM,IDUM,IDUM,ABSTOL,  & 
+               M,EIG,VEC,LRV,IDUM,WORKDUM,-1,IWORKDUM,-1,IERR)
+
+   LLWORK = NINT(WORKDUM)
+   LILWORK = IWORKDUM
+
+   allocate(WORK(LLWORK), stat=ierr)
+   allocate(IWORK(LILWORK), stat=ierr)
+   allocate(ISUPPZ(2*N),stat=ierr)
+
+   IERR = 0
+   CALL DSTEGR(JOBZ,'A',N,DIAG,OFFDIAG,DDUM,DDUM,IDUM,IDUM,ABSTOL,  &
+               M,EIG,VEC,LRV,ISUPPZ,WORK,LLWORK,IWORK,LILWORK,IERR)     
+   if (IERR /= 0) then
+     print *,'The lapack_dstegr routine ended with error ! ierr=',ierr
+   endif
+
+  ! ... print out eigenvalues
+  if (print_level >= 0) then
+     print *,"LAPACK DSTEGR eigenvalues:"
+     do i=1,N
+       print *,i,EIG(i)
+     enddo
+   endif
+
+   call eigv_check(EIG,VEC,'**** LAPACK DSYTRD+DSTEGR ****')
+
+   deallocate(ArTemp,DIAG,OFFDIAG,WORK,IWORK,EIG,VEC,ISUPPZ)
+
+  end subroutine test_lapack_dstegr
 
 !&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
   subroutine test_dirac_rs
@@ -293,5 +388,6 @@ Program Test_DIRAC_Diagonalization_Routines
   call read_matrix
   call test_dirac_rs
   call test_lapack_dsyevr
+  call test_lapack_dstegr
 
 End Program Test_DIRAC_Diagonalization_Routines
