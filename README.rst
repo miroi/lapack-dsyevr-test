@@ -2,9 +2,9 @@
 lapack-dsyevr-test
 ==================
 
-Important self-test of the famous lapack's diagonalization routine DSYEVR.
+Important self-test of the famous lapack's diagonalization routine DSYEVR. It checks eigenvectors orthogonality. GNU lapack is affected with the bug, see https://github.com/Reference-LAPACK/lapack/issues/151. 
 
-Software buildup is based upon autocmake project ( https://github.com/scisoft/autocmake ).
+This small software buildup is based upon autocmake project ( https://github.com/coderefinery/autocmake ).
 
 Buildup examples 
 ----------------
