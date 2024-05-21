@@ -9,13 +9,20 @@ This small software buildup is based upon autocmake project ( https://github.com
 Quick buildup
 -------------
 
-Clone the repository, go the src/ directory and type there:
+Clone the repository, go the src/ directory and type there if you want native GNU lapack:
 
 ::
 
  gfortran -fallow-argument-mismatch dsyevr_check.F90 eispack.F -llapack -lblas
 
-you get the a.out executable you can work with.
+You can utilize the openblas directory
+
+::
+
+ gfortran -fallow-argument-mismatch dsyevr_check.F90 eispack.F -lopenblas
+
+You get the a.out executable you can work with, as shown below.
+
 
 Buildup examples 
 ----------------
