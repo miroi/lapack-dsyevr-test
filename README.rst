@@ -6,6 +6,17 @@ Important self-test of the famous lapack's diagonalization routine DSYEVR. It ch
 
 This small software buildup is based upon autocmake project ( https://github.com/coderefinery/autocmake ).
 
+Quick buildup
+-------------
+
+Clone the repository, go the src/ directory and type there:
+
+::
+
+ gfortran -fallow-argument-mismatch dsyevr_check.F90 eispack.F -llapack -lblas
+
+you get the a.out executable you can work with.
+
 Buildup examples 
 ----------------
 
@@ -29,7 +40,7 @@ confirms eigenvectors nonorthogonality in the dsyevr routine:
      U*U^{+} - I ?= 0> norm/diag:0.8556D-05  norm/offdiag:0.5285D-05
 
 
-- Gfortran (4.7.2) and the downloaded Lapack 3.6.0
+- Gfortran (4.7.2) and the own downloaded Lapack 3.6.0
 
 ::
  
