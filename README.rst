@@ -15,7 +15,7 @@ Clone the repository, go the src/ directory and type there if you want native GN
 
  gfortran -fallow-argument-mismatch dsyevr_check.F90 eispack.F -llapack -lblas
 
-You can utilize the openblas directory
+Alternatively, you can utilize the openblas library:
 
 ::
 
