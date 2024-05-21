@@ -9,17 +9,17 @@ This small software buildup is based upon autocmake project ( https://github.com
 Buildup examples 
 ----------------
 
-- Gfortran 4.7.2 and system native libraries (/usr/lib/liblapack.so /usr/lib/libblas.so)
+- Gfortran 4.7.2 and later versions, with system native libraries (/usr/lib/liblapack.so /usr/lib/libblas.so)
 
 ::
 
- python setup --fc=gfortran --cmake-options="-D MATH_LIB_SEARCH_ORDER='SYSTEM_NATIVE'"  build_gfortran_sysnatlibs
+ python setup --fc=gfortran --extra-fc-flags="-fallow-argument-mismatch" --cmake-options="-D MATH_LIB_SEARCH_ORDER='SYSTEM_NATIVE'"  build_gfortran_sysnatlibs
  cd build_gfortran_sysnatlibs
  make VERBOSE=1
  cd src
  ./dsyerv_check
 
-confirms nonorthogonality in dsyevr routine:
+confirms eigenvectors nonorthogonality in the dsyevr routine:
 
 ::
 
@@ -80,7 +80,7 @@ shows the nonorthogonality:
  cd src
  ./dsyerv_check
 
-confirms vectors orthogonality in the dsyevr routine:
+confirms eigenvectors orthogonality in the dsyevr routine:
 
 ::
 
